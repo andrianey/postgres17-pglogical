@@ -1,0 +1,32 @@
+services:
+  pg_publisher:
+    build: .
+    container_name: pg_publisher
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
+    command: postgres -c shared_preload_libraries=pglogical -c wal_level=logical -c max_wal_senders=10 -c max_replication_slots=10 -c track_commit_timestamp=on
+    volumes:
+      - pg_publisher_data:/var/lib/postgresql/data
+
+  pg_subscriber:
+    build: .
+    container_name: pg_subscriber
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
+    command: postgres -c shared_preload_libraries=pglogical -c wal_level=logical -c max_wal_senders=10 -c max_replication_slots=10 -c track_commit_timestamp=on
+    volumes:
+      - pg_subscriber_data:/var/lib/postgresql/data
+
+volumes:
+  pg_publisher_data:
+  pg_subscriber_data:
